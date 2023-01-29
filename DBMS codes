@@ -1,0 +1,37 @@
+	create users
+
+create user 'DBMS_admin'@'localhost'
+    -> identified by 'DBMS_admin1';
+
+create user 'DBMS_dean'@'localhost'
+    -> identified by 'DBMS_dean1';
+
+create user 'DBMS_lecturer'@'localhost'
+    -> identified by 'DBMS_lecturer1';
+
+create user 'DBMS_demo'@'localhost'
+    -> identified by 'DBMS_demo1';
+
+create user 'DBMS_Technical_officer'@'localhost'
+    -> identified by 'DBMS_technical_officer1';
+
+create user 'DBMS_student'@'localhost'
+    -> identified by 'DBMS_student1';
+_______________________________________________________________________________________________________________
+	grant privileges
+
+GRANT ALL PRIVILEGES ON DBMS.* TO 'DBMS_admin'@'localhost' WITH GRANT OPTION;
+
+GRANT ALL PRIVILEGES ON DBMS.* TO 'DBMS_dean'@'localhost';
+
+GRANT ALL PRIVILEGES ON DBMS.* TO 'DBMS_lecturer'@'localhost';
+REVOKE CREATE ON DBMS.* FROM 'DBMS_lecturer'@'localhost';
+
+GRANT SELECT ON DBMS.* TO 'DBMS_demo'@'localhost';
+
+
+
+_______________________________________________________________________________________________________________
+	create view to show summary of attendance of whole batch
+create view Attendance_summary as select Attendance_ICT.atn_stu_id,sum(Lecture_ICT.l_hour)/(select sum(l_hour) from Lecture_ICT where l_type='Theory' or l_type='Practical' )*100 as Precentage_of_Attendance from Lecture_ICT,Attendance_ICT where Attendance_ICT.atn_status='Pr' and (Lecture_ICT.l_type='Theory' or Lecture_ICT.l_type='Practical') and Attendance_ICT.atn_l_id=Lecture_ICT.l_id group by Attendance_ICT.atn_stu_id;
+

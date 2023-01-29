@@ -1,0 +1,394 @@
+Attendance_summary
+
+create procedure Attendance_summary(in stu_id char(6))
+begin
+declare cor_count,tot_lec_t,tot_lec_p,atn_t,atn_p,med_t,med_p int;
+declare practical,theory,prac_med,theo_med,tot_att decimal(10,0);
+declare corid char(9);
+declare cors_name char(30);
+
+
+select count(cor_id) into cor_count from Course_module;
+
+while cor_count>0 do
+	
+	set tot_lec_t=0;
+	set tot_lec_p=0;
+	set atn_t=0;
+	set atn_p=0;	
+	set med_p=0;
+	set med_t=0;
+
+
+	select cor_id into corid from Course_module where cor_id like concat('ict_11',cor_count,'%');
+	
+	select sum(l_hour) into tot_lec_t from Lecture_ICT where l_type='Theory' and l_cor_id = corid;
+
+	select sum(Lecture_ICT.l_hour) into atn_t from Attendance_ICT, Lecture_ICT where Attendance_ICT.atn_status='Pr' and Attendance_ICT.atn_l_id=Lecture_ICT.l_id and Lecture_ICT.l_type='Theory' and Lecture_ICT.l_cor_id=corid and  Attendance_ICT.atn_stu_id=stu_id;
+
+	
+	select sum(l_hour) into tot_lec_p from Lecture_ICT where l_type='Practical' and l_cor_id=corid;
+
+	select sum(Lecture_ICT.l_hour) into atn_p from Attendance_ICT, Lecture_ICT where Attendance_ICT.atn_status='Pr' and Attendance_ICT.atn_l_id=Lecture_ICT.l_id and Lecture_ICT.l_type='Practical' and Lecture_ICT.l_cor_id=corid and  Attendance_ICT.atn_stu_id=stu_id;
+
+
+	select sum(hours) into med_t from Medical_ICT_details where lecture_type='Theory' and student_id=stu_id and course_id=corid;
+ 	if (med_t is NULL) then
+	set med_t=0;
+	end if;
+	select sum(hours) into med_p from Medical_ICT_details where lecture_type='Practical' and student_id=stu_id and course_id=corid;
+ 	if (med_p is null) then
+	set med_p=0;
+	end if;
+
+	
+	set theory=atn_t/tot_lec_t*100;
+	set practical=atn_p/tot_lec_p*100;
+	set prac_med=(atn_p+med_p)/(tot_lec_p)*100;
+	set theo_med=(atn_t+med_t)/(tot_lec_t)*100;
+	set tot_att=(prac_med+theo_med)/2;
+ 	
+	if (practical is null) then
+	set tot_att=theo_med;
+	end if;
+
+	select cor_name into cors_name from Course_module where cor_id=corid;
+	select cors_name as Course_Module,theory as Theory,practical as Practical,theo_med as Theory_with_Medical,prac_med as Practical_with_Medical,tot_att as Theory_Practical_with_Medical ;
+
+
+	set cor_count=cor_count - 1;	
+end while;	
+
+end//
+
+
+
++---------------------+--------+-----------+---------------------+------------------------+-------------------------------+
+| Course_Module       | Theory | Practical | Theory_with_Medical | Practical_with_Medical | Theory_Practical_with_Medical |
++---------------------+--------+-----------+---------------------+------------------------+-------------------------------+
+| Computer Laboratory |    100 |       100 |                 100 |                    100 |                           100 |
++---------------------+--------+-----------+---------------------+------------------------+-------------------------------+
+1 row in set (0.00 sec)
+
++-------------------------------+--------+-----------+---------------------+------------------------+-------------------------------+
+| Course_Module                 | Theory | Practical | Theory_with_Medical | Practical_with_Medical | Theory_Practical_with_Medical |
++-------------------------------+--------+-----------+---------------------+------------------------+-------------------------------+
+| Management Information System |    100 |       100 |                 100 |                    100 |                           100 |
++-------------------------------+--------+-----------+---------------------+------------------------+-------------------------------+
+1 row in set (0.01 sec)
+
++----------------------+--------+-----------+---------------------+------------------------+-------------------------------+
+| Course_Module        | Theory | Practical | Theory_with_Medical | Practical_with_Medical | Theory_Practical_with_Medical |
++----------------------+--------+-----------+---------------------+------------------------+-------------------------------+
+| Computer Programming |    100 |       100 |                 100 |                    100 |                           100 |
++----------------------+--------+-----------+---------------------+------------------------+-------------------------------+
+1 row in set (0.01 sec)
+
++----------------+--------+-----------+---------------------+------------------------+-------------------------------+
+| Course_Module  | Theory | Practical | Theory_with_Medical | Practical_with_Medical | Theory_Practical_with_Medical |
++----------------+--------+-----------+---------------------+------------------------+-------------------------------+
+| PC Application |    100 |       100 |                 100 |                    100 |                           100 |
++----------------+--------+-----------+---------------------+------------------------+-------------------------------+
+1 row in set (0.01 sec)
+
++----------------+--------+-----------+---------------------+------------------------+-------------------------------+
+| Course_Module  | Theory | Practical | Theory_with_Medical | Practical_with_Medical | Theory_Practical_with_Medical |
++----------------+--------+-----------+---------------------+------------------------+-------------------------------+
+| Web Technology |     89 |        83 |                 100 |                    100 |                           100 |
++----------------+--------+-----------+---------------------+------------------------+-------------------------------+
+1 row in set (0.01 sec)
+
++-------------------+--------+-----------+---------------------+------------------------+-------------------------------+
+| Course_Module     | Theory | Practical | Theory_with_Medical | Practical_with_Medical | Theory_Practical_with_Medical |
++-------------------+--------+-----------+---------------------+------------------------+-------------------------------+
+| Essentials of ICT |     93 |      NULL |                 100 |                   NULL |                           100 |
++-------------------+--------+-----------+---------------------+------------------------+-------------------------------+
+1 row in set (0.01 sec)
+
+
+
+
+
+Attendance_summary`(in stu_id char(6))
+begin
+declare cor_count,tot_lec_t,tot_lec_p,atn_t,atn_p,med_t,med_p int;
+declare practical,theory,prac_med,theo_med,tot_att decimal(10,0);
+declare corid char(9);
+declare cors_name char(30);
+
+
+select count(cor_id) into cor_count from Course_module;
+
+while cor_count>0 do
+
+set tot_lec_t=0;
+set tot_lec_p=0;
+set atn_t=0;
+set atn_p=0;
+set med_p=0;
+set med_t=0;
+
+
+select cor_id into corid from Course_module where cor_id like concat('ict_11',cor_count,'%');
+
+select sum(l_hour) into tot_lec_t from Lecture_ICT where l_type='Theory' and l_cor_id = corid;
+
+select sum(Lecture_ICT.l_hour) into atn_t from Attendance_ICT, Lecture_ICT where Attendance_ICT.atn_status='Pr' and Attendance_ICT.atn_l_id=Lecture_ICT.l_id and Lecture_ICT.l_type='Theory' and Lecture_ICT.l_cor_id=corid and  Attendance_ICT.atn_stu_id=stu_id;
+
+
+select sum(l_hour) into tot_lec_p from Lecture_ICT where l_type='Practical' and l_cor_id=corid;
+
+select sum(Lecture_ICT.l_hour) into atn_p from Attendance_ICT, Lecture_ICT where Attendance_ICT.atn_status='Pr' and Attendance_ICT.atn_l_id=Lecture_ICT.l_id and Lecture_ICT.l_type='Practical' and Lecture_ICT.l_cor_id=corid and  Attendance_ICT.atn_stu_id=stu_id;
+
+
+select sum(hours) into med_t from Medical_ICT_details where lecture_type='Theory' and student_id=stu_id and course_id=corid;
+ if (med_t is NULL) then
+set med_t=0;
+end if;
+select sum(hours) into med_p from Medical_ICT_details where lecture_type='Practical' and student_id=stu_id and course_id=corid;
+ if (med_p is null) then
+set med_p=0;
+end if;
+
+
+set theory=atn_t/tot_lec_t*100;
+set practical=atn_p/tot_lec_p*100;
+set prac_med=(atn_p+med_p)/(tot_lec_p)*100;
+set theo_med=(atn_t+med_t)/(tot_lec_t)*100;
+set tot_att=(prac_med+theo_med)/2;
+ 
+if (practical is null) then
+set tot_att=theo_med;
+end if;
+
+select cor_name into cors_name from Course_module where cor_id=corid;
+select cors_name as Course_Module,theory as Theory,practical as Practical,theo_med as Theory_with_Medical,prac_med as Practical_with_Medical,tot_att as Theory_Practical_with_Medical ;
+
+
+set cor_count=cor_count - 1;
+end while;
+
+
+____________________________________________________________________________________________________________________________
+Attendance_view
+
+
+create procedure Attendance_view(in stu_id char(6),in corid char(9))
+begin
+declare tot_lec_t,tot_lec_p,atn_t,atn_p,med_t,med_p int;
+declare practical,theory,tot_att decimal(10,0);
+
+select Lecture_ICT.l_id,Lecture_ICT.l_date as date,Lecture_ICT.l_start_time as time,Lecture_ICT.l_hour as hours,Lecture_ICT.l_type as type,IF(Attendance_ICT.atn_status='Pr',"Present","Absent") as status  from Lecture_ICT,Attendance_ICT where Attendance_ICT.atn_stu_id=stu_id and Attendance_ICT.atn_l_id=Lecture_ICT.l_id and Lecture_ICT.l_cor_id=corid and (Lecture_ICT.l_type='Theory' or Lecture_ICT.l_type='Practical') order by Lecture_ICT.l_date,Lecture_ICT.l_start_time asc;
+
+select sum(l_hour) into tot_lec_t from Lecture_ICT where l_type='Theory' and l_cor_id = corid;
+select sum(l_hour) into tot_lec_p from Lecture_ICT where l_type='Practical' and l_cor_id=corid;
+
+select sum(Lecture_ICT.l_hour) into atn_t from Attendance_ICT, Lecture_ICT where Attendance_ICT.atn_status='Pr' and Attendance_ICT.atn_l_id=Lecture_ICT.l_id and Lecture_ICT.l_type='Theory' and Lecture_ICT.l_cor_id=corid and  Attendance_ICT.atn_stu_id=stu_id;
+
+select sum(Lecture_ICT.l_hour) into atn_p from Attendance_ICT, Lecture_ICT where Attendance_ICT.atn_status='Pr' and Attendance_ICT.atn_l_id=Lecture_ICT.l_id and Lecture_ICT.l_type='Practical' and Lecture_ICT.l_cor_id=corid and  Attendance_ICT.atn_stu_id=stu_id;
+
+select sum(hours) into med_t from Medical_ICT_details where lecture_type='Theory' and student_id=stu_id and course_id=corid;
+ if (med_t is NULL) then
+set med_t=0;
+end if;
+select sum(hours) into med_p from Medical_ICT_details where lecture_type='Practical' and student_id=stu_id and course_id=corid;
+ if (med_p is null) then
+set med_p=0;
+end if;
+
+set practical=(atn_p+med_p)/(tot_lec_p)*100;
+set theory=(atn_t+med_t)/(tot_lec_t)*100;
+set tot_att=(practical+theory)/2;
+
+if (practical is null) then
+set tot_att=theory;
+end if;
+end//
+
++-------+------------+----------+-------+--------+---------+
+| l_id  | date       | time     | hours | type   | status  |
++-------+------------+----------+-------+--------+---------+
+| l_1   | 2020-01-01 | 08:00:00 |  2.00 | Theory | Present |
+| l_10  | 2020-01-04 | 08:00:00 |  2.00 | Theory | Present |
+| l_19  | 2020-01-09 | 08:00:00 |  2.00 | Theory | Present |
+| l_28  | 2020-01-12 | 08:00:00 |  2.00 | Theory | Present |
+| l_37  | 2020-01-17 | 08:00:00 |  2.00 | Theory | Present |
+| l_46  | 2020-01-22 | 08:00:00 |  2.00 | Theory | Present |
+| l_55  | 2020-01-25 | 08:00:00 |  2.00 | Theory | Present |
+| l_64  | 2020-01-30 | 08:00:00 |  2.00 | Theory | Present |
+| l_73  | 2020-02-02 | 08:00:00 |  2.00 | Theory | Present |
+| l_82  | 2020-02-07 | 08:00:00 |  2.00 | Theory | Present |
+| l_91  | 2020-02-12 | 08:00:00 |  2.00 | Theory | Present |
+| l_100 | 2020-02-15 | 08:00:00 |  2.00 | Theory | Present |
+| l_109 | 2020-02-20 | 08:00:00 |  2.00 | Theory | Present |
+| l_118 | 2020-02-23 | 08:00:00 |  2.00 | Theory | Present |
+| l_127 | 2020-02-28 | 08:00:00 |  2.00 | Theory | Present |
++-------+------------+----------+-------+--------+---------+
+15 rows in set (0.11 sec)
+
++--------+-----------+------------+
+| Theory | Practical | Attendance |
++--------+-----------+------------+
+| 100%   | NULL      | 100%       |
++--------+-----------+------------+
+
+
+____________________________________________________________________________________________________________________________
+
+add medical
+
+NEW
+
+
+
+
+create procedure Attendance_view(in stu_id char(6),in corid char(9))
+begin
+declare tot_lec_t,tot_lec_p,atn_t,atn_p,med_t,med_p int;
+declare practical,theory,tot_att decimal(10,0);
+
+
+select distinct Lecture_ICT.l_id,Lecture_ICT.l_date as date,Lecture_ICT.l_start_time as time,Lecture_ICT.l_hour as hours,Lecture_ICT.l_type as type,IF(Attendance_ICT.atn_status='Pr',"Present",IF(Attendance_ICT.atn_l_id in(select l_id from Medical_ICT_details where student_id=stu_id and course_id=corid),"Medical","Absent")) as status  from Lecture_ICT,Attendance_ICT,Medical_ICT_details where Attendance_ICT.atn_stu_id=stu_id and Attendance_ICT.atn_l_id=Lecture_ICT.l_id and Lecture_ICT.l_cor_id=corid and (Lecture_ICT.l_type='Theory' or Lecture_ICT.l_type='Practical')  order by Lecture_ICT.l_date,Lecture_ICT.l_start_time asc;
+
+select sum(l_hour) into tot_lec_t from Lecture_ICT where l_type='Theory' and l_cor_id = corid;
+select sum(l_hour) into tot_lec_p from Lecture_ICT where l_type='Practical' and l_cor_id=corid;
+
+select sum(Lecture_ICT.l_hour) into atn_t from Attendance_ICT, Lecture_ICT where Attendance_ICT.atn_status='Pr' and Attendance_ICT.atn_l_id=Lecture_ICT.l_id and Lecture_ICT.l_type='Theory' and Lecture_ICT.l_cor_id=corid and  Attendance_ICT.atn_stu_id=stu_id;
+
+select sum(Lecture_ICT.l_hour) into atn_p from Attendance_ICT, Lecture_ICT where Attendance_ICT.atn_status='Pr' and Attendance_ICT.atn_l_id=Lecture_ICT.l_id and Lecture_ICT.l_type='Practical' and Lecture_ICT.l_cor_id=corid and  Attendance_ICT.atn_stu_id=stu_id;
+
+select sum(hours) into med_t from Medical_ICT_details where lecture_type='Theory' and student_id=stu_id and course_id=corid;
+ if (med_t is NULL) then
+set med_t=0;
+end if;
+select sum(hours) into med_p from Medical_ICT_details where lecture_type='Practical' and student_id=stu_id and course_id=corid;
+ if (med_p is null) then
+set med_p=0;
+end if;
+
+set practical=(atn_p+med_p)/(tot_lec_p)*100;
+set theory=(atn_t+med_t)/(tot_lec_t)*100;
+set tot_att=(practical+theory)/2;
+
+if (practical is null) then
+set tot_att=theory;
+end if;
+
+select concat(theory,"%") as Theory,concat(practical,"%") as Practical,concat(tot_att,"%") as Attendance;
+end// 
+
+
+call Attendance_view('stu009','ict_1113')//
++-------+------------+----------+-------+--------+---------+
+| l_id  | date       | time     | hours | type   | status  |
++-------+------------+----------+-------+--------+---------+
+| l_1   | 2020-01-01 | 08:00:00 |  2.00 | Theory | Medical |
+| l_10  | 2020-01-04 | 08:00:00 |  2.00 | Theory | Present |
+| l_19  | 2020-01-09 | 08:00:00 |  2.00 | Theory | Present |
+| l_28  | 2020-01-12 | 08:00:00 |  2.00 | Theory | Present |
+| l_37  | 2020-01-17 | 08:00:00 |  2.00 | Theory | Present |
+| l_46  | 2020-01-22 | 08:00:00 |  2.00 | Theory | Present |
+| l_55  | 2020-01-25 | 08:00:00 |  2.00 | Theory | Present |
+| l_64  | 2020-01-30 | 08:00:00 |  2.00 | Theory | Present |
+| l_73  | 2020-02-02 | 08:00:00 |  2.00 | Theory | Present |
+| l_82  | 2020-02-07 | 08:00:00 |  2.00 | Theory | Present |
+| l_91  | 2020-02-12 | 08:00:00 |  2.00 | Theory | Present |
+| l_100 | 2020-02-15 | 08:00:00 |  2.00 | Theory | Present |
+| l_109 | 2020-02-20 | 08:00:00 |  2.00 | Theory | Present |
+| l_118 | 2020-02-23 | 08:00:00 |  2.00 | Theory | Present |
+| l_127 | 2020-02-28 | 08:00:00 |  2.00 | Theory | Present |
++-------+------------+----------+-------+--------+---------+
+15 rows in set (0.01 sec)
+
++--------+-----------+------------+
+| Theory | Practical | Attendance |
++--------+-----------+------------+
+| 100%   | NULL      | 100%       |
++--------+-----------+------------+
+
+
+
+___________________________________________________________________________________________________________________________________________
+
+
+create procedure Attendance_summary(in stu_id char(6))
+begin
+declare cor_count,tot_lec_t,tot_lec_p,atn_t,atn_p,med_t,med_p int;
+declare practical,theory,prac_med,theo_med,tot_att decimal(10,0);
+declare corid char(9);
+declare cors_name char(30);
+
+
+select count(cor_id) into cor_count from Course_module;
+
+while cor_count>0 do
+
+set tot_lec_t=0;
+set tot_lec_p=0;
+set atn_t=0;
+set atn_p=0;
+set med_p=0;
+set med_t=0;
+
+
+select cor_id into corid from Course_module where cor_id like concat('ict_11',cor_count,'%');
+
+select sum(l_hour) into tot_lec_t from Lecture_ICT where l_type='Theory' and l_cor_id = corid;
+
+select sum(Lecture_ICT.l_hour) into atn_t from Attendance_ICT, Lecture_ICT where Attendance_ICT.atn_status='Pr' and Attendance_ICT.atn_l_id=Lecture_ICT.l_id and Lecture_ICT.l_type='Theory' and Lecture_ICT.l_cor_id=corid and  Attendance_ICT.atn_stu_id=stu_id;
+
+
+select sum(l_hour) into tot_lec_p from Lecture_ICT where l_type='Practical' and l_cor_id=corid;
+
+select sum(Lecture_ICT.l_hour) into atn_p from Attendance_ICT, Lecture_ICT where Attendance_ICT.atn_status='Pr' and Attendance_ICT.atn_l_id=Lecture_ICT.l_id and Lecture_ICT.l_type='Practical' and Lecture_ICT.l_cor_id=corid and  Attendance_ICT.atn_stu_id=stu_id;
+
+
+select sum(hours) into med_t from Medical_ICT_details where lecture_type='Theory' and student_id=stu_id and course_id=corid;
+ if (med_t is NULL) then
+set med_t=0;
+end if;
+select sum(hours) into med_p from Medical_ICT_details where lecture_type='Practical' and student_id=stu_id and course_id=corid;
+ if (med_p is null) then
+set med_p=0;
+end if;
+
+
+set theory=atn_t/tot_lec_t*100;
+set practical=atn_p/tot_lec_p*100;
+set prac_med=(atn_p+med_p)/(tot_lec_p)*100;
+set theo_med=(atn_t+med_t)/(tot_lec_t)*100;
+set tot_att=(prac_med+theo_med)/2;
+ 
+if (practical is null) then
+set tot_att=theo_med;
+end if;
+
+select cor_name into cors_name from Course_module where cor_id=corid;
+select cors_name as Course_Module,concat(theory,"%") as Theory,concat(practical,"%") as Practical,concat(theo_med,"%") as Theory_with_Medical,concat(prac_med,"%") as Practical_with_Medical,concat(tot_att,"%") as Theory_Practical_with_Medical ;
+
+
+set cor_count=cor_count - 1;
+end while;
+end//
+
+
+
+
+
+
+
+
+
+
+
+
+
+select distinct Lecture_ICT.l_id,Lecture_ICT.l_date as date,Lecture_ICT.l_start_time as time,Lecture_ICT.l_hour as hours,Lecture_ICT.l_type as type,IF(Attendance_ICT.atn_status='Pr',"Present",IF(Attendance_ICT.atn_l_id in(select l_id from Medical_ICT_details where student_id=stu_id and course_id=corid),"Medical","Absent")) as status  from Lecture_ICT,Attendance_ICT,Medical_ICT_details where Attendance_ICT.atn_stu_id=stu_id and Attendance_ICT.atn_l_id=Lecture_ICT.l_id and Lecture_ICT.l_cor_id=corid and (Lecture_ICT.l_type='Theory' or Lecture_ICT.l_type='Practical')  order by Lecture_ICT.l_date,Lecture_ICT.l_start_time asc;
+
+
+
+
+select distinct Lecture_ICT.l_id,Lecture_ICT.l_date as date,Lecture_ICT.l_start_time as time,Lecture_ICT.l_hour as hours,Lecture_ICT.l_type as type,IF(Attendance_ICT.atn_status='Pr',"Present",IF(Attendance_ICT.atn_l_id in(select l_id from Medical_ICT_details where student_id='stu008' and course_id='ict_1123'),"Medical","Absent")) as status  from Lecture_ICT,Attendance_ICT,Medical_ICT_details where Attendance_ICT.atn_stu_id='stu008' and Attendance_ICT.atn_l_id=Lecture_ICT.l_id and Lecture_ICT.l_cor_id='ict_1123' and (Lecture_ICT.l_type='Theory' or Lecture_ICT.l_type='Practical')  order by Lecture_ICT.l_date,Lecture_ICT.l_start_time asc;
+
+
+_______________________________________________________________________________________________________________________________

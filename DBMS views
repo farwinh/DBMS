@@ -1,0 +1,59 @@
+Attendance_summary
+
+create view Attendance_summary as select Attendance_ICT.atn_stu_id as Student_id,cast(sum(Lecture_ICT.l_hour)/(select sum(l_hour) from Lecture_ICT where l_type='Theory' or l_type='Practical' )*100 as decimal(10)) as Attendance_without_Medical from Lecture_ICT,Attendance_ICT where Attendance_ICT.atn_status='Pr' and (Lecture_ICT.l_type='Theory' or Lecture_ICT.l_type='Practical') and Attendance_ICT.atn_l_id=Lecture_ICT.l_id group by Attendance_ICT.atn_stu_id;
+
++--------------------------+--------------+------+-----+---------+-------+
+| Field                    | Type         | Null | Key | Default | Extra |
++--------------------------+--------------+------+-----+---------+-------+
+| atn_stu_id               | char(6)      | YES  |     | NULL    |       |
+| Precentage_of_Attendance | double(23,6) | YES  |     | NULL    |       |
++--------------------------+--------------+------+-----+---------+-------+
++------------+----------------------------+
+| Student_id | Attendance_without_Medical |
++------------+----------------------------+
+| stu001     |                        100 |
+| stu002     |                        100 |
+| stu003     |                        100 |
+| stu004     |                        100 |
+| stu005     |                        100 |
+| stu006     |                        100 |
+| stu007     |                         94 |
+| stu008     |                         96 |
+| stu009     |                         97 |
+| stu010     |                        100 |
++------------+----------------------------+
+
+______________________________________________________________________________________________________________________
+
+select Medical_ICT.med_stu_id,sum(Lecture_ICT.l_hour) from Lecture_ICT,Medical_ICT where Medical_ICT.med_l_id=Lecture_ICT.l_id and (Lecture_ICT.l_type='Theory' or Lecture_ICT.l_type='Practical') group by Medical_ICT.med_stu_id;
+
+
+select Attendance_ICT.atn_stu_id as Student_id,cast(sum(Lecture_ICT.l_hour)/(select sum(l_hour) from Lecture_ICT where l_type='Theory' or l_type='Practical' )*100 as decimal(10)) as Attendance_without_Medical,cast(sum(Lecture_ICT.l_hour)/(select sum(l_hour) from Lecture_ICT where l_type='Theory' or l_type='Practical' )*100 as decimal(10)) as Attendance_with_Medical from Lecture_ICT,Attendance_ICT where Attendance_ICT.atn_status='Pr' and (Lecture_ICT.l_type='Theory' or Lecture_ICT.l_type='Practical') and Attendance_ICT.atn_l_id=Lecture_ICT.l_id group by Attendance_ICT.atn_stu_id;
+
+______________________________________________________________________________________________________________________
+Medical_ICT_details
+
+create view Medical_ICT_details as select Medical_ICT.med_stu_id as student_id,Lecture_ICT.l_id,Lecture_ICT.l_cor_id as course_id,Lecture_ICT.l_type as
+ lecture_type,Lecture_ICT.l_hour as hours from Lecture_ICT,Medical_ICT  where Medical_ICT.med_l_id=Lecture_ICT.l_id;
+
++--------------+-------------+------+-----+---------+-------+
+| Field        | Type        | Null | Key | Default | Extra |
++--------------+-------------+------+-----+---------+-------+
+| student_id   | char(6)     | YES  |     | NULL    |       |
+| l_id         | varchar(50) | NO   |     | NULL    |       |
+| course_id    | char(9)     | YES  |     | NULL    |       |
+| lecture_type | varchar(10) | YES  |     | NULL    |       |
+| hours        | float(9,2)  | YES  |     | NULL    |       |
++--------------+-------------+------+-----+---------+-------+
++------------+-------+-----------+--------------+-------+
+| student_id | l_id  | course_id | lecture_type | hours |
++------------+-------+-----------+--------------+-------+
+| stu009     | l_1   | ict_1113  | Theory       |  2.00 |
+| stu009     | l_2   | ict_1123  | Theory       |  2.00 |
+| stu009     | l_3   | ict_1123  | Practical    |  3.00 |
+| stu004     | l_177 | ict_1113  | Final_theory |  2.00 |
+| stu006     | l_174 | ict_1123  | Mid_term     |  1.00 |
+| stu005     | l_170 | ict_1143  | Assessment_3 |  1.00 |
+| stu005     | l_167 | ict_1143  | Assessment_2 |  1.00 |
+| stu005     | l_164 | ict_1143  | Assessment_1 |  1.00 |
++------------+-------+-----------+--------------+-------+
